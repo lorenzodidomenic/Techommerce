@@ -10,5 +10,4 @@ app.use('/shop', express.static('./src/views'));
 //Routes
 app.use('/', require('./routes/routes'));
 
-const PORT = 8000;
-app.listen(PORT);
+app.listen(process.env.DEV_PORT);
