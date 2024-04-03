@@ -6,7 +6,8 @@ const { indexView,
         contactView,
         cartView,
         checkoutView,
-        thankyouView } = require('../controllers/controllers');
+        thankyouView,
+        addCart } = require('../controllers/controllers');
 const router = express.Router();
 
 router.get('/', indexView);
@@ -15,6 +16,9 @@ router.get('/shop/:category', shopFilterView);
 router.get('/about', aboutView);
 router.get('/contact', contactView);
 router.get('/cart', cartView);
+router.post('/add_cart', function(req: Request, res: Response) {
+    addCart;
+});
 router.get('/checkout', checkoutView);
 router.get('/thankyou', thankyouView);
 

@@ -4,11 +4,11 @@ const mysql = require('mysql');
 const connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : '',
+  password : 'password',
   database : 'techommerce'
 });
 
-type Product = {
+export type Product = {
     id: number,
     name: string,
     price: number,
@@ -59,6 +59,18 @@ let getProductsByCategory = (category: string) => {
     });
 };
 
+let getProductsById = (product_id: string) => {
+    return new Promise<Product>((resolve,reject) => {
+        let sql = 'SELECT * FROM products WHERE id = ';
+        sql.concat(product_id);
+        connection.query(sql, function (error: Error, results: Product) {
+            if (error)
+                throw error;
+            return resolve(results);
+        });
+    });
+};
+
 const indexView = (req: Request, res: Response) => {
     res.render("./index");
 }
@@ -76,6 +88,39 @@ const shopFilterView = async (req: Request, res: Response) => {
     res.render("./shop", {products: prods, categories: cats, category: req.params.category});
 }
 
+const addCart = (req: Request, res: Response) => {
+    if (!req.session.cart) {
+        req.session.cart = [];
+    }
+
+    const product_id = req.body.product_id;
+    const product_name = req.body.product_name;
+    const product_price = req.body.product_price;
+    const image = req.body.product_image;
+
+
+    if (req.body.quantity !== undefined) {
+        for (let i = 0; i < req.session.cart.length; i++) {
+            if (req.session.cart[i].product_id == product_id) {
+                req.session.cart[i].quantity += 1;
+                res.redirect("/cart");
+            }
+        }
+    } else {
+        const cart_data = {
+            product_id: product_id,
+            product_name: product_name,
+            price: product_price,
+            image: image, 
+            quantity: 1,
+        };
+
+        req.session.cart.push(cart_data);
+        res.redirect("/shop");
+    }
+
+}
+
 const aboutView = (req: Request, res: Response) => {
     res.render("./about");
 }
@@ -85,7 +130,10 @@ const contactView = (req: Request, res: Response) => {
 }
 
 const cartView = (req: Request, res: Response) => {
-    res.render("./cart");
+    if(!req.session.cart) {
+        req.session.cart = [];
+    } 
+    res.render("./cart", {cart_data: req.session.cart});
 }
 
 const checkoutView = (req: Request, res: Response) => {
@@ -104,5 +152,6 @@ module.exports =  {
     contactView,
     cartView,
     checkoutView,
-    thankyouView
+    thankyouView,
+    addCart,
 };
