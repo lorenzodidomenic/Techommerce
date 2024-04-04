@@ -12,6 +12,8 @@ app.use(session({
 	saveUninitialized : true,
 	cookie : { secure : false }
 }))
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 app.use('/', express.static('./src/views'));
 app.use('/shop', express.static('./src/views'));
 

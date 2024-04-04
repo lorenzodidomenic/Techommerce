@@ -34,12 +34,16 @@ let getCategories = () => {
     });
 };
 
-let getProducts = () => {
+let getProducts = (req: Request) => {
     return new Promise<Product[]>((resolve, reject) => {
         let sql = 'SELECT * FROM products';
         connection.query(sql, function (error: Error, results: Product[]) {
             if (error)
                throw error;
+
+               if (!req.session.cart) {
+                    req.session.cart = [];
+               }
              
             return resolve(results);
         }); 
@@ -59,17 +63,6 @@ let getProductsByCategory = (category: string) => {
     });
 };
 
-let getProductsById = (product_id: string) => {
-    return new Promise<Product>((resolve,reject) => {
-        let sql = 'SELECT * FROM products WHERE id = ';
-        sql.concat(product_id);
-        connection.query(sql, function (error: Error, results: Product) {
-            if (error)
-                throw error;
-            return resolve(results);
-        });
-    });
-};
 
 const indexView = (req: Request, res: Response) => {
     res.render("./index");
@@ -77,7 +70,7 @@ const indexView = (req: Request, res: Response) => {
 
 //For Shop Page
 const shopView = async (req: Request, res: Response) => {
-    let prods: Product[] = await getProducts();
+    let prods: Product[] = await getProducts(req);
     let cats: Category[] = await getCategories();
     res.render("./shop", {products: prods, categories: cats});
 }
@@ -89,24 +82,22 @@ const shopFilterView = async (req: Request, res: Response) => {
 }
 
 const addCart = (req: Request, res: Response) => {
-    if (!req.session.cart) {
-        req.session.cart = [];
-    }
-
     const product_id = req.body.product_id;
     const product_name = req.body.product_name;
     const product_price = req.body.product_price;
     const image = req.body.product_image;
 
-
-    if (req.body.quantity !== undefined) {
-        for (let i = 0; i < req.session.cart.length; i++) {
-            if (req.session.cart[i].product_id == product_id) {
-                req.session.cart[i].quantity += 1;
-                res.redirect("/cart");
-            }
+    let product_exists: Boolean = false;
+    for (let i = 0; i < req.session.cart.length; i++) {
+        
+        if (req.session.cart[i].product_id == product_id) {
+            req.session.cart[i].quantity += 1;
+            product_exists = true;
         }
-    } else {
+
+    }
+
+    if (!product_exists) {
         const cart_data = {
             product_id: product_id,
             product_name: product_name,
@@ -114,11 +105,9 @@ const addCart = (req: Request, res: Response) => {
             image: image, 
             quantity: 1,
         };
-
         req.session.cart.push(cart_data);
-        res.redirect("/shop");
     }
-
+    res.redirect("/shop");
 }
 
 const aboutView = (req: Request, res: Response) => {
@@ -129,10 +118,8 @@ const contactView = (req: Request, res: Response) => {
     res.render("./contact");
 }
 
-const cartView = (req: Request, res: Response) => {
-    if(!req.session.cart) {
-        req.session.cart = [];
-    } 
+const cartView = async (req: Request, res: Response) => {
+    let prods: Product[] = await getProducts(req);
     res.render("./cart", {cart_data: req.session.cart});
 }
 
