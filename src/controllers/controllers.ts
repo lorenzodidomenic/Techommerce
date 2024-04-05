@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 require('dotenv').config();
 
+//qui stabilisco la connessione col database
 const mysql = require('mysql');
 const connection = mysql.createConnection({
   host     : process.env.HOST,
@@ -23,7 +24,9 @@ type Category = {
     name: string
 }
 
+//funzioni che userò per fare le query e ottenere i dati che passerò nel reindering delle view 
 let getCategories = () => {
+    //faccio la query per ottenere tutte le categorie
     return new Promise<Category[]>((resolve, reject) => {
         let sql = 'SELECT * FROM categories';
         connection.query(sql, function (error: Error, results: Category[]) {
@@ -36,6 +39,7 @@ let getCategories = () => {
 };
 
 let getProducts = (req: Request) => {
+    //faccio la query per ottenere tutti i prodotti
     return new Promise<Product[]>((resolve, reject) => {
         let sql = 'SELECT * FROM products';
         connection.query(sql, function (error: Error, results: Product[]) {
@@ -52,6 +56,7 @@ let getProducts = (req: Request) => {
 };
 
 let getProductsByCategory = (category: string) => {
+    //faccio la query per ottenre i prodotti di una certa categoria, facendo una query annidata 
     return new Promise<Product[]>((resolve, reject) => {
         let sql = 'SELECT * FROM products WHERE category_id = ';
             sql += '(SELECT id FROM categories WHERE name = ' + connection.escape(category) + ')';
@@ -65,21 +70,40 @@ let getProductsByCategory = (category: string) => {
 };
 
 
+//faccio reindering delle view 
+
 const indexView = (req: Request, res: Response) => {
     res.render("./index");
 }
 
 //For Shop Page
 const shopView = async (req: Request, res: Response) => {
-    let prods: Product[] = await getProducts(req);
+    let prods: Product[] = await getProducts(req);   
     let cats: Category[] = await getCategories();
-    res.render("./shop", {products: prods, categories: cats});
+    res.render("./shop", {products: prods, categories: cats});  //gli passo nel reindering tutti i prodotti e tutte le categorie 
 }
 
 const shopFilterView = async (req: Request, res: Response) => {
     let prods: Product[] = await getProductsByCategory(req.params.category);
     let cats: Category[] = await getCategories();
-    res.render("./shop", {products: prods, categories: cats, category: req.params.category});
+    res.render("./shop", {products: prods, categories: cats, category: req.params.category});  //gli passo nel reindergin i prodotti di una certa categoria e tutte le categorie
+}
+
+
+const aboutView = (req: Request, res: Response) => {
+    res.render("./about");
+}
+
+const contactView = (req: Request, res: Response) => {
+    res.render("./contact");
+}
+
+const checkoutView = (req: Request, res: Response) => {
+    res.render("./checkout");
+}
+
+const thankyouView = (req: Request, res: Response) => {
+    res.render("./thankyou");
 }
 
 const addCart = (req: Request, res: Response) => {
@@ -111,25 +135,10 @@ const addCart = (req: Request, res: Response) => {
     res.redirect("/shop");
 }
 
-const aboutView = (req: Request, res: Response) => {
-    res.render("./about");
-}
-
-const contactView = (req: Request, res: Response) => {
-    res.render("./contact");
-}
 
 const cartView = async (req: Request, res: Response) => {
     let prods: Product[] = await getProducts(req);
     res.render("./cart", {cart_data: req.session.cart});
-}
-
-const checkoutView = (req: Request, res: Response) => {
-    res.render("./checkout");
-}
-
-const thankyouView = (req: Request, res: Response) => {
-    res.render("./thankyou");
 }
 
 module.exports =  {

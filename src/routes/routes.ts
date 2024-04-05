@@ -16,9 +16,7 @@ router.get('/shop/:category', shopFilterView);
 router.get('/about', aboutView);
 router.get('/contact', contactView);
 router.get('/cart', cartView);
-router.post('/add_cart', 
-    addCart
-);
+router.post('/add_cart', addCart);
 router.get('/checkout', checkoutView);
 router.get('/thankyou', thankyouView);
 
