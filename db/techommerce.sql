@@ -64,7 +64,7 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `price`, `description`, `img`, `category_id`) VALUES
-(1, 'Lenovo V 15 G2 IJL', 299, `Progettato per l\'ambiente di lavoro moderno, il notebook Lenovo V15 di seconda generazione (15,6\" Intel) è il compagno di lavoro perfetto. Adatto per produttività e mobilità, assicura ottime prestazioni in ufficio o a casa.`, 'lenovoV15G2IJL.jpg', 1),
+(1, 'Lenovo V 15 G2 IJL', 299, "Progettato per l'ambiente di lavoro moderno, il notebook Lenovo V15 di seconda generazione (15,6 Intel) è il compagno di lavoro perfetto. Adatto per produttività e mobilità, assicura ottime prestazioni in ufficio o a casa." , 'lenovoV15G2IJL.jpg', 1),
 (2, 'Samsung Galaxy A54 5G', 369.9, 'Display FHD+ Super AMOLED 6.4”, Android 13, 8GB RAM, 256GB, Doppia SIM, Batteria 5.000 mAh, Awesome Graphite.', 'samsungGalaxyA54.jpg', 2);
 
 --

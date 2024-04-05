@@ -61,7 +61,12 @@
                     <% if(products.length > 0) { %>
                         <% for (let i = 0; i < products.length; i++) { %>
                             <div class="col-12 col-md-4 col-lg-3 mb-5">
-                                <a class="product-item" href="#">
+								<form action="/add_cart" method="post">
+								<input type="hidden" name="product_id" value="<%= products[i].id %>">
+								<input type="hidden" name="product_name" value="<%= products[i].name %>">
+								<input type="hidden" name="product_price" value="<%= products[i].price %>">
+								<input type="hidden" name="product_image" value="<%= products[i].img %>">
+								<button class="product-item">
                                     <img src="images/<%= products[i].img %>" class="img-fluid product-thumbnail">
                                     <h3 class="product-title"><%= products[i].name %></h3>
                                     <strong class="product-price">€ <%= products[i].price.toFixed(2) %></strong>
@@ -69,7 +74,8 @@
                                     <span class="icon-cross">
                                         <img src="images/cross.svg" class="img-fluid">
                                     </span>
-                                </a>
+                                </button>
+								</form>
                             </div>
                         <% } %>
                     <% } else { %>
