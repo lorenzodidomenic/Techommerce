@@ -5,7 +5,7 @@ require('dotenv').config();
 const mysql = require('mysql');
 const connection = mysql.createConnection({
   host     : process.env.HOST,
-  user     : process.env.USER,
+  user     : process.env.USERNAME,
   password : process.env.PASSWORD,
   database : process.env.DB
 });
@@ -107,11 +107,13 @@ const thankyouView = (req: Request, res: Response) => {
 }
 
 const addCart = (req: Request, res: Response) => {
+    //prnedo i valori che mi ha madnato la richiesta post fatta al click di un acquisto 
     const product_id = req.body.product_id;
     const product_name = req.body.product_name;
     const product_price = req.body.product_price;
     const image = req.body.product_image;
 
+    //vado ad inizializzare l'array session aumentando la quantità dell'elemento che è stato selsionato 
     let product_exists: Boolean = false;
     for (let i = 0; i < req.session.cart.length; i++) {
         
@@ -122,7 +124,9 @@ const addCart = (req: Request, res: Response) => {
 
     }
 
+    //se il prodotto non esiste in sessio cart
     if (!product_exists) {
+        //creo un elemento che aggiungerò nel carrello
         const cart_data = {
             product_id: product_id,
             product_name: product_name,
@@ -132,12 +136,12 @@ const addCart = (req: Request, res: Response) => {
         };
         req.session.cart.push(cart_data);
     }
-    res.redirect("/shop");
+    res.redirect("/shop");  //ritorniamo alla view shop
 }
 
-
+//per vedere il carrello facciamo una queri di tutti i prodotti e gli passiamo la sessione
 const cartView = async (req: Request, res: Response) => {
-    let prods: Product[] = await getProducts(req);
+    let prods: Product[] = await getProducts(req);  //questa forse inutile
     res.render("./cart", {cart_data: req.session.cart});
 }
 
