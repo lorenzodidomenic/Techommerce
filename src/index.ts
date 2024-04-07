@@ -21,3 +21,4 @@ app.use('/shop', express.static('./src/views'));
 app.use('/', require('./routes/routes'));
 
 app.listen(process.env.DEV_PORT);
+

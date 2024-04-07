@@ -54,6 +54,7 @@ CREATE TABLE `products` (
   `id` bigint(20) NOT NULL,
   `name` varchar(50) NOT NULL,
   `price` double NOT NULL,
+  `quantity` int(11) NOT NULL DEFAULT 0,
   `description` text DEFAULT NULL,
   `img` varchar(100) DEFAULT NULL,
   `category_id` bigint(20) NOT NULL
@@ -65,7 +66,8 @@ CREATE TABLE `products` (
 
 INSERT INTO `products` (`id`, `name`, `price`, `description`, `img`, `category_id`) VALUES
 (1, 'Lenovo V 15 G2 IJL', 299, "Progettato per l'ambiente di lavoro moderno, il notebook Lenovo V15 di seconda generazione (15,6 Intel) è il compagno di lavoro perfetto. Adatto per produttività e mobilità, assicura ottime prestazioni in ufficio o a casa." , 'lenovoV15G2IJL.jpg', 1),
-(2, 'Samsung Galaxy A54 5G', 369.9, 'Display FHD+ Super AMOLED 6.4”, Android 13, 8GB RAM, 256GB, Doppia SIM, Batteria 5.000 mAh, Awesome Graphite.', 'samsungGalaxyA54.jpg', 2);
+(2, 'Samsung Galaxy A54 5G', 369.9, 'Display FHD+ Super AMOLED 6.4”, Android 13, 8GB RAM, 256GB, Doppia SIM, Batteria 5.000 mAh, Awesome Graphite.', 'samsungGalaxyA54.jpg', 2),
+(3, 'HP 250 G9 Computer portatile', 499.9, 0, "Pensato per il business. HP 250 G9 Laptop offre tutte le funzionalità essenziali per la produttività aziendale in un design sottile e leggero, facile da trasportare. Tutte le funzionalità necessarie per assicurare la massima produttività, a un prezzo contenuto: display da 15,6', un invidiabile rapporto screen-to-body[5], un potente processore Intel®[2], memoria rapida, unità di storage, porte per la connessione di periferiche.", 'hp250G9.jpg', 1);
 
 --
 -- Indexes for dumped tables
