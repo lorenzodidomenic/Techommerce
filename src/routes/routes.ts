@@ -1,4 +1,5 @@
 const express = require('express');
+//mi prendo le view che ho definito nel controller
 const { indexView,
         shopView,
         shopFilterView,
@@ -22,4 +23,5 @@ router.post('/remove_cart', removeCart);
 router.get('/checkout', checkoutView);
 router.get('/thankyou', thankyouView);
 
+//esporto il route che mi serverà poi in index.js
 module.exports = router;
