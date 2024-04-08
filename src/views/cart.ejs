@@ -34,109 +34,114 @@
 			</div>
 		<!-- End Hero Section -->
 
-		
-
-		<div class="untree_co-section before-footer-section">
-            <div class="container">
-              <div class="row mb-5">
-                <form class="col-md-12" method="post">
-                  <div class="site-blocks-table">
-                    <table class="table">
-                      <thead>
-                        <tr>
-                          <th class="product-thumbnail">Image</th>
-                          <th class="product-name">Product</th>
-                          <th class="product-price">Price</th>
-                          <th class="product-quantity">Quantity</th>
-                          <th class="product-total">Total</th>
-                          <th class="product-remove">Remove</th>
-                        </tr>
-                      </thead>
-                     <% if (cart_data.length > 0) { %> 
-                      <tbody>
-                        <% for (let i = 0; i < cart_data.length; i++) { %>
-                        <tr>
-                          <form action="/add_cart" method="post">
-                          <td class="product-thumbnail">
-                            <img src="images/<%= cart_data[i].image %>" alt="Image" class="img-fluid">
-                          </td>
-                          <td class="product-name">
-                            <h2 class="h5 text-black"><%= cart_data[i].product_name %></h2>
-                          </td>
-                          <td><%= cart_data[i].price %></td>
-                          <td>
-                            <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px;">
-                              <div class="input-group-prepend">
-                                <button class="btn btn-outline-black decrease" type="button">&minus;</button>
-                              </div>
-                              <input type="text" name="quantity" class="form-control text-center quantity-amount" value="<%= cart_data[i].quantity %>" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
-                              <div class="input-group-append">
-                                <button class="btn btn-outline-black increase" type="button">&plus;</button>
-                              </div>
-                            </div>
-        
-                          </td>
-                          <td><%= cart_data[i].price %></td>
-                          <td><a href="#" class="btn btn-black btn-sm">X</a></td>
-                          </form>
-                        </tr>
-                        <% } %>
-                        <% } %>
-                      </tbody>
-                    </table>
-                  </div>
-                </form>
+		<div id="products_list" class="untree_co-section before-footer-section">
+      <div class="container">
+        <div class="row mb-5">
+          <div class="site-blocks-table">
+          <% if (cart_data.length > 0) { %>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th class="product-thumbnail">Image</th>
+                  <th class="product-name">Product</th>
+                  <th class="product-price">Price</th>
+                  <th class="product-quantity">Quantity</th>
+                  <th class="product-total">Total</th>
+                </tr>
+              </thead> 
+              <tbody>
+                <% for (let i = 0; i < cart_data.length; i++) { %>
+                <tr> 
+                  <td class="product-thumbnail">
+                    <img src="images/<%= cart_data[i].image %>" alt="Image" class="img-fluid">
+                  </td>
+                  <td class="product-name">
+                    <h2 class="h5 text-black"><%= cart_data[i].product_name %></h2>
+                  </td>
+                  <td>€ <%= parseFloat(cart_data[i].price).toFixed(2) %></td>
+                  <td>
+                    <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px; margin-left: 65px;">
+                      <div class="input-group-prepend">
+                        <form action="/remove_cart" method="POST">
+                          <input type="hidden" name="product_id" value="<%= cart_data[i].product_id %>">
+                          <button class="btn btn-outline-black decrease">&minus;</button>
+                        </form>
+                      </div>
+                      <input type="number" disabled name="quantity" class="form-control text-center quantity-amount" value="<%= cart_data[i].quantity %>" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
+                      <div class="input-group-append">
+                        <form action="/add_cart" method="POST">
+                          <input type="hidden" name="action" value="increment_quantity">
+                          <input type="hidden" name="product_id" value="<%= cart_data[i].product_id %>">
+                          <input type="hidden" name="product_name" value="<%= cart_data[i].product_name %>">
+                          <input type="hidden" name="product_price" value="<%= cart_data[i].price %>">
+                          <input type="hidden" name="product_quantity" value="<%= cart_data[i].max_quantity %>">
+                          <input type="hidden" name="product_image" value="<%= cart_data[i].image %>">
+                          <button class="btn btn-outline-black increase">&plus;</button>
+                        </form>
+                      </div>
+                    </div>
+                  </td>
+                  <td>€ <%= parseFloat(cart_data[i].price).toFixed(2) %></td>
+                </tr>
+                <% } %>
+              </tbody>
+            </table>
+           <% } else { %>
+             <div>
+                 <h2><b>No products in the cart!</b></h2>
+             </div>
+           <% } %>
+          </div>
+        </div>
+  
+        <div class="row">
+          <div class="col-md-6">
+            <div class="row mb-5">
+              <div class="col-md-6 mb-3 mb-md-0">
+                <button class="btn btn-black btn-sm btn-block">Update Cart</button>
               </div>
-        
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="row mb-5">
-                    <div class="col-md-6 mb-3 mb-md-0">
-                      <button class="btn btn-black btn-sm btn-block">Update Cart</button>
-                    </div>
-                    <div class="col-md-6">
-                      <form method="GET" action="/shop"><button class="btn btn-outline-black btn-sm btn-block">Continue Shopping</button></form>
-                    </div>
+              <div class="col-md-6">
+                <button class="btn btn-outline-black btn-sm btn-block">Continue Shopping</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 pl-5">
+            <div class="row justify-content-end">
+              <div class="col-md-7">
+                <div class="row">
+                  <div class="col-md-12 text-right border-bottom mb-5">
+                    <h3 class="text-black h4 text-uppercase">Cart Totals</h3>
                   </div>
                 </div>
-                <div class="col-md-6 pl-5">
-                  <div class="row justify-content-end">
-                    <div class="col-md-7">
-                      <div class="row">
-                        <div class="col-md-12 text-right border-bottom mb-5">
-                          <h3 class="text-black h4 text-uppercase">Cart Totals</h3>
-                        </div>
-                      </div>
-                      <div class="row mb-3">
-                        <div class="col-md-6">
-                          <span class="text-black">Subtotal</span>
-                        </div>
-                        <div class="col-md-6 text-right">
-                          <strong class="text-black">$230.00</strong>
-                        </div>
-                      </div>
-                      <div class="row mb-5">
-                        <div class="col-md-6">
-                          <span class="text-black">Total</span>
-                        </div>
-                        <div class="col-md-6 text-right">
-                          <strong class="text-black">$230.00</strong>
-                        </div>
-                      </div>
-        
-                      <div class="row">
-                        <div class="col-md-12">
-                          <button class="btn btn-black btn-lg py-3 btn-block" onclick="window.location='/checkout'">Proceed To Checkout</button>
-                        </div>
-                      </div>
-                    </div>
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <span class="text-black">Subtotal</span>
+                  </div>
+                  <div class="col-md-6 text-right">
+                    <strong class="text-black">€ <%= parseFloat(cart_total).toFixed(2) %></strong>
+                  </div>
+                </div>
+                <div class="row mb-5">
+                  <div class="col-md-6">
+                    <span class="text-black">Total</span>
+                  </div>
+                  <div class="col-md-6 text-right">
+                    <strong class="text-black">€ <%= parseFloat(cart_total).toFixed(2) %></strong>
+                  </div>
+                </div>
+  
+                <div class="row">
+                  <div class="col-md-12">
+                    <button class="btn btn-black btn-lg py-3 btn-block" onclick="window.location='/checkout'">Proceed To Checkout</button>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
 		
-
 		<!-- Start Footer Section -->
 		<%- include('./partials/footer.ejs'); -%>
 		<!-- End Footer Section -->	
