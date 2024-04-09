@@ -4,7 +4,7 @@ require('dotenv').config();
 const mysql = require('mysql');
 const connection = mysql.createConnection({
   host     : process.env.HOST,
-  user     : process.env.USER,
+  user     : process.env.USERNAME,
   password : process.env.PASSWORD,
   database : process.env.DB
 });
@@ -134,6 +134,17 @@ const removeCart = (req: Request, res: Response) => {
     res.redirect("/cart#products_list");
 }
 
+const emptyCart = (req:Request, res:Response ) => {
+    
+    checkSessionDataInitialized(req);
+
+    if(req.session.cart.length > 0){
+    req.session.cart.length = 0;
+    req.session.cartTotal = 0.0;
+    }
+    
+    res.render("./cart", {cart_data: req.session.cart, cart_total: req.session.cartTotal});
+}
 const aboutView = (req: Request, res: Response) => {
     res.render("./about");
 }
@@ -169,5 +180,6 @@ module.exports =  {
     checkoutView,
     thankyouView,
     addCart,
-    removeCart
+    removeCart,
+    emptyCart
 };
