@@ -8,9 +8,8 @@ const { indexView,
         cartView,
         checkoutView,
         thankyouView,
-        addCart } = require('../controllers/controllers');
-
-//mi creo un router e mappo richiesta_path-view
+        addCart,
+        removeCart } = require('../controllers/controllers');
 const router = express.Router();
 
 router.get('/', indexView);
@@ -20,6 +19,7 @@ router.get('/about', aboutView);
 router.get('/contact', contactView);
 router.get('/cart', cartView);
 router.post('/add_cart', addCart);
+router.post('/remove_cart', removeCart);
 router.get('/checkout', checkoutView);
 router.get('/thankyou', thankyouView);
 

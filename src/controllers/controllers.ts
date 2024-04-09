@@ -1,11 +1,10 @@
 import { Request, Response } from 'express';
 require('dotenv').config();
 
-//qui stabilisco la connessione col database
 const mysql = require('mysql');
 const connection = mysql.createConnection({
   host     : process.env.HOST,
-  user     : process.env.USERNAME,
+  user     : process.env.USER,
   password : process.env.PASSWORD,
   database : process.env.DB
 });
@@ -14,6 +13,7 @@ export type Product = {
     id: number,
     name: string,
     price: number,
+    quantity: number,
     description: string,
     img: string,
     category_id: number
@@ -24,9 +24,17 @@ type Category = {
     name: string
 }
 
-//funzioni che userò per fare le query e ottenere i dati che passerò nel reindering delle view 
+function checkSessionDataInitialized(req: Request){
+    if (!req.session.cart) {
+        req.session.cart = [];
+    }
+
+    if(!req.session.cartTotal){
+        req.session.cartTotal = 0.0;
+    }
+}
+
 let getCategories = () => {
-    //faccio la query per ottenere tutte le categorie
     return new Promise<Category[]>((resolve, reject) => {
         let sql = 'SELECT * FROM categories';
         connection.query(sql, function (error: Error, results: Category[]) {
@@ -38,27 +46,21 @@ let getCategories = () => {
     });
 };
 
-let getProducts = (req: Request) => {
-    //faccio la query per ottenere tutti i prodotti
+let getProducts = () => {
     return new Promise<Product[]>((resolve, reject) => {
-        let sql = 'SELECT * FROM products';
+        let sql = 'SELECT * FROM products WHERE quantity > 0';
         connection.query(sql, function (error: Error, results: Product[]) {
             if (error)
                throw error;
-
-               if (!req.session.cart) {
-                    req.session.cart = [];
-               }
-             
+            
             return resolve(results);
         }); 
     });
 };
 
 let getProductsByCategory = (category: string) => {
-    //faccio la query per ottenre i prodotti di una certa categoria, facendo una query annidata 
     return new Promise<Product[]>((resolve, reject) => {
-        let sql = 'SELECT * FROM products WHERE category_id = ';
+        let sql = 'SELECT * FROM products WHERE quantity > 0 AND category_id = ';
             sql += '(SELECT id FROM categories WHERE name = ' + connection.escape(category) + ')';
         connection.query(sql, function (error: Error, results: Product[]) {
             if (error)
@@ -69,26 +71,68 @@ let getProductsByCategory = (category: string) => {
     });
 };
 
-
-//faccio reindering delle view 
-
 const indexView = (req: Request, res: Response) => {
     res.render("./index");
 }
 
-//For Shop Page
 const shopView = async (req: Request, res: Response) => {
-    let prods: Product[] = await getProducts(req);   
+    let prods: Product[] = await getProducts();
     let cats: Category[] = await getCategories();
-    res.render("./shop", {products: prods, categories: cats});  //gli passo nel reindering tutti i prodotti e tutte le categorie 
+    checkSessionDataInitialized(req);
+    res.render("./shop", {products: prods, categories: cats});
 }
 
 const shopFilterView = async (req: Request, res: Response) => {
     let prods: Product[] = await getProductsByCategory(req.params.category);
     let cats: Category[] = await getCategories();
-    res.render("./shop", {products: prods, categories: cats, category: req.params.category});  //gli passo nel reindergin i prodotti di una certa categoria e tutte le categorie
+    checkSessionDataInitialized(req);
+    res.render("./shop", {products: prods, categories: cats, category: req.params.category});
 }
 
+const addCart = async (req: Request, res: Response) => {
+    const action = req.body.action;
+    const product_id = req.body.product_id;
+    const product_name = req.body.product_name;
+    const product_price = req.body.product_price;
+    const product_quantity = req.body.product_quantity;
+    const image = req.body.product_image;
+
+    const index = req.session.cart.findIndex((element) => element.product_id === product_id);
+    if (index !== -1) {
+        if(req.session.cart[index].quantity < product_quantity){
+            req.session.cart[index].quantity += 1;
+        }
+    } else {
+        const product = {
+            product_id: product_id,
+            product_name: product_name,
+            price: product_price,
+            image: image, 
+            quantity: 1,
+            max_quantity: product_quantity
+        };
+        req.session.cart.push(product);
+    }
+    
+    if (action === "add_product")
+        res.redirect("/shop#products_list");
+    else
+        res.redirect("/cart#products_list");
+
+}
+
+const removeCart = (req: Request, res: Response) => {
+    const product_id = req.body.product_id;
+   
+    const index = req.session.cart.findIndex((element) => element.product_id === product_id);
+    if(index !== -1){
+        req.session.cart[index].quantity--;
+        if(req.session.cart[index].quantity === 0)
+            req.session.cart.splice(index, 1);
+    }
+   
+    res.redirect("/cart#products_list");
+}
 
 const aboutView = (req: Request, res: Response) => {
     res.render("./about");
@@ -98,51 +142,21 @@ const contactView = (req: Request, res: Response) => {
     res.render("./contact");
 }
 
+const cartView = async (req: Request, res: Response) => {
+    checkSessionDataInitialized(req);
+    req.session.cartTotal = 0.0;
+    for (let i = 0; i < req.session.cart.length; i++) {
+        req.session.cartTotal += (req.session.cart[i].price * req.session.cart[i].quantity);
+    }
+    res.render("./cart", {cart_data: req.session.cart, cart_total: req.session.cartTotal});
+}
+
 const checkoutView = (req: Request, res: Response) => {
     res.render("./checkout");
 }
 
 const thankyouView = (req: Request, res: Response) => {
     res.render("./thankyou");
-}
-
-const addCart = (req: Request, res: Response) => {
-    //prnedo i valori che mi ha madnato la richiesta post fatta al click di un acquisto 
-    const product_id = req.body.product_id;
-    const product_name = req.body.product_name;
-    const product_price = req.body.product_price;
-    const image = req.body.product_image;
-
-    //vado ad inizializzare l'array session aumentando la quantità dell'elemento che è stato selsionato 
-    let product_exists: Boolean = false;
-    for (let i = 0; i < req.session.cart.length; i++) {
-        
-        if (req.session.cart[i].product_id == product_id) {
-            req.session.cart[i].quantity += 1;
-            product_exists = true;
-        }
-
-    }
-
-    //se il prodotto non esiste in sessio cart
-    if (!product_exists) {
-        //creo un elemento che aggiungerò nel carrello
-        const cart_data = {
-            product_id: product_id,
-            product_name: product_name,
-            price: product_price,
-            image: image, 
-            quantity: 1,
-        };
-        req.session.cart.push(cart_data);
-    }
-    res.redirect("/shop");  //ritorniamo alla view shop
-}
-
-//per vedere il carrello facciamo una queri di tutti i prodotti e gli passiamo la sessione
-const cartView = async (req: Request, res: Response) => {
-    let prods: Product[] = await getProducts(req);  //questa forse inutile
-    res.render("./cart", {cart_data: req.session.cart});
 }
 
 module.exports =  {
@@ -155,4 +169,5 @@ module.exports =  {
     checkoutView,
     thankyouView,
     addCart,
+    removeCart
 };
