@@ -27,6 +27,10 @@ SET time_zone = "+00:00";
 -- Table structure for table `categories`
 --
 
+CREATE SCHEMA techommerce;
+USE techommerce;
+
+
 CREATE TABLE `categories` (
   `id` bigint(20) NOT NULL,
   `name` varchar(50) NOT NULL

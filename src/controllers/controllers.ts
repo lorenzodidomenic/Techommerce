@@ -134,6 +134,19 @@ const removeCart = (req: Request, res: Response) => {
     res.redirect("/cart#products_list");
 }
 
+const emptyCart = (req:Request, res:Response ) => {
+
+    checkSessionDataInitialized(req);
+
+    while(req.session.cart.length > 0){
+    req.session.cart.pop()
+    }
+
+    req.session.cartTotal = 0.0
+
+    res.render("./cart", {cart_data: req.session.cart, cart_total: req.session.cartTotal});
+}
+
 const aboutView = (req: Request, res: Response) => {
     res.render("./about");
 }
@@ -169,5 +182,6 @@ module.exports =  {
     checkoutView,
     thankyouView,
     addCart,
-    removeCart
+    removeCart,
+    emptyCart
 };
