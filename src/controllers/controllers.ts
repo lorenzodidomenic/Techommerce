@@ -32,6 +32,17 @@ function checkSessionDataInitialized(req: Request){
     if(!req.session.cartTotal){
         req.session.cartTotal = 0.0;
     }
+
+    if(!req.session.productsUnavailable){
+        req.session.productsUnavailable = [];
+    }
+}
+
+function computeCartTotal(req: Request){
+    req.session.cartTotal = 0.0;
+    for (let i = 0; i < req.session.cart.length; i++) {
+        req.session.cartTotal += (req.session.cart[i].price * req.session.cart[i].quantity);
+    }
 }
 
 let getCategories = () => {
@@ -79,28 +90,31 @@ const shopView = async (req: Request, res: Response) => {
     let prods: Product[] = await getProducts();
     let cats: Category[] = await getCategories();
     checkSessionDataInitialized(req);
-    res.render("./shop", {products: prods, categories: cats});
+    res.render("./shop", {products: prods, categories: cats, products_unavailable: req.session.productsUnavailable});
 }
 
 const shopFilterView = async (req: Request, res: Response) => {
     let prods: Product[] = await getProductsByCategory(req.params.category);
     let cats: Category[] = await getCategories();
     checkSessionDataInitialized(req);
-    res.render("./shop", {products: prods, categories: cats, category: req.params.category});
+    res.render("./shop", {products: prods, categories: cats, category: req.params.category, products_unavailable: req.session.productsUnavailable});
 }
 
 const addCart = async (req: Request, res: Response) => {
-    const action = req.body.action;
-    const product_id = req.body.product_id;
-    const product_name = req.body.product_name;
-    const product_price = req.body.product_price;
-    const product_quantity = req.body.product_quantity;
-    const image = req.body.product_image;
+    const action: string = req.body.action;
+    const product_id: number = req.body.product_id;
+    const product_name: string = req.body.product_name;
+    const product_price: number = req.body.product_price;
+    const product_quantity: number = req.body.product_quantity;
+    const image: string = req.body.product_image;
 
-    const index = req.session.cart.findIndex((element) => element.product_id === product_id);
+    const index = req.session.cart.findIndex((element) => element.product_id == product_id);
     if (index !== -1) {
         if(req.session.cart[index].quantity < product_quantity){
-            req.session.cart[index].quantity += 1;
+            req.session.cart[index].quantity++;
+            if(req.session.cart[index].quantity == product_quantity){
+                req.session.productsUnavailable.push(product_id);
+            }   
         }
     } else {
         const product = {
@@ -113,7 +127,7 @@ const addCart = async (req: Request, res: Response) => {
         };
         req.session.cart.push(product);
     }
-    
+
     if (action === "add_product")
         res.redirect("/shop#products_list");
     else
@@ -127,8 +141,15 @@ const removeCart = (req: Request, res: Response) => {
     const index = req.session.cart.findIndex((element) => element.product_id === product_id);
     if(index !== -1){
         req.session.cart[index].quantity--;
+        if(req.session.cart[index].quantity < req.session.cart[index].max_quantity){
+            const j = req.session.productsUnavailable.findIndex((element) => element === product_id);
+            if(j !== -1)
+                req.session.productsUnavailable.splice(j, 1);
+        }
+
         if(req.session.cart[index].quantity === 0)
             req.session.cart.splice(index, 1);
+
     }
    
     res.redirect("/cart#products_list");
@@ -157,11 +178,8 @@ const contactView = (req: Request, res: Response) => {
 
 const cartView = async (req: Request, res: Response) => {
     checkSessionDataInitialized(req);
-    req.session.cartTotal = 0.0;
-    for (let i = 0; i < req.session.cart.length; i++) {
-        req.session.cartTotal += (req.session.cart[i].price * req.session.cart[i].quantity);
-    }
-    res.render("./cart", {cart_data: req.session.cart, cart_total: req.session.cartTotal});
+    computeCartTotal(req);
+    res.render("./cart", {cart_data: req.session.cart, cart_total: req.session.cartTotal, products_unavailable: req.session.productsUnavailable});
 }
 
 const checkoutView = (req: Request, res: Response) => {

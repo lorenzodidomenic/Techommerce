@@ -76,7 +76,9 @@
                           <input type="hidden" name="product_price" value="<%= cart_data[i].price %>">
                           <input type="hidden" name="product_quantity" value="<%= cart_data[i].max_quantity %>">
                           <input type="hidden" name="product_image" value="<%= cart_data[i].image %>">
-                          <button class="btn btn-outline-black increase">&plus;</button>
+                          <% if (products_unavailable.indexOf(String(cart_data[i].product_id)) === -1) { %>
+                            <button class="btn btn-outline-black increase">&plus;</button>
+                          <% } %>
                         </form>
                       </div>
                     </div>
