@@ -138,10 +138,11 @@ const emptyCart = (req:Request, res:Response ) => {
     
     checkSessionDataInitialized(req);
 
-    if(req.session.cart.length > 0){
-    req.session.cart.length = 0;
-    req.session.cartTotal = 0.0;
+    while(req.session.cart.length > 0){
+    req.session.cart.pop()
     }
+    
+    req.session.cartTotal = 0.0
     
     res.render("./cart", {cart_data: req.session.cart, cart_total: req.session.cartTotal});
 }
