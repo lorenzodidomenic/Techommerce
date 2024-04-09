@@ -1,7 +1,7 @@
 import { Session } from 'express-session';
 
 type cartData = {
-    product_id: string,
+    product_id: number,
     product_name: string,
     price: number,
     image: string,
@@ -13,6 +13,7 @@ declare module 'express-session' {
     interface Session {
         userId: string,
         cart: cartData[],
-        cartTotal: number    
+        cartTotal: number,
+        productsUnavailable: number[]   
     }
 }
