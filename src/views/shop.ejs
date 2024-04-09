@@ -71,6 +71,7 @@
 									<div class="product-item">
 										<img src="images/<%= products[i].img %>" class="img-fluid product-thumbnail">
 										<h3 class="product-title"><%= products[i].name %></h3>
+										<small class="product-description"> <%= products[i].description %> </small> <br>
 										<strong class="product-price">€ <%= products[i].price.toFixed(2) %></strong>
 										<% if (products_unavailable.indexOf(String(products[i].id)) === -1) { %>
 											<span class="icon-cross">

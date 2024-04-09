@@ -9,7 +9,8 @@ const { indexView,
         checkoutView,
         thankyouView,
         addCart,
-        removeCart } = require('../controllers/controllers');
+        removeCart,
+        emptyCart } = require('../controllers/controllers');
 const router = express.Router();
 
 router.get('/', indexView);
@@ -19,6 +20,7 @@ router.get('/about', aboutView);
 router.get('/contact', contactView);
 router.get('/cart', cartView);
 router.post('/add_cart', addCart);
+router.post('/empty_cart',emptyCart);
 router.post('/remove_cart', removeCart);
 router.get('/checkout', checkoutView);
 router.get('/thankyou', thankyouView);
