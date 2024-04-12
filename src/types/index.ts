@@ -9,11 +9,19 @@ type cartData = {
     max_quantity: number
 };
 
+
+type Cart = {
+    cart: cartData[];
+}
+
 declare module 'express-session' {
     interface Session {
         userId: string,
         cart: cartData[],
         cartTotal: number,
+        listOrder: cartData[][],   
+        listOrderPrice: number[],
+        listOrderTotal: number,
         productsUnavailable: number[]   
     }
 }

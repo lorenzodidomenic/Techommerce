@@ -9,8 +9,11 @@ const { indexView,
         checkoutView,
         thankyouView,
         addCart,
+        removeCart,
+        buyCart
         decreaseCart,
         emptyCart } = require('../controllers/controllers');
+
 const router = express.Router();
 
 router.get('/', indexView);
@@ -24,5 +27,6 @@ router.post('/empty_cart',emptyCart);
 router.post('/decrease_cart', decreaseCart);
 router.get('/checkout', checkoutView);
 router.get('/thankyou', thankyouView);
+router.post('/buyCart', buyCart);
 
 module.exports = router;
