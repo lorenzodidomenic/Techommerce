@@ -124,11 +124,11 @@ const addCart = async (req: Request, res: Response) => {
     const product_quantity: number = req.body.product_quantity;
     const image: string = req.body.product_image;
 
-    const index = req.session.cart.findIndex((element) => element.product_id == product_id);
+    const index = req.session.cart.findIndex((element) => element.product_id == product_id); // find product in the cart
     if (index !== -1) {
         if(req.session.cart[index].quantity < product_quantity){
             req.session.cart[index].quantity++;
-            if(req.session.cart[index].quantity == product_quantity){
+            if(req.session.cart[index].quantity == product_quantity){ // reach maximum quantity
                 req.session.productsUnavailable.push(product_id);
             }   
         }
@@ -137,38 +137,56 @@ const addCart = async (req: Request, res: Response) => {
             product_id: product_id,
             product_name: product_name,
             price: product_price,
-            image: image, 
+            img: image, 
             quantity: 1,
             max_quantity: product_quantity
         };
-        req.session.cart.push(product);
+        req.session.cart.push(product); // add product in the cart
     }
 
-    if (action === "add_product")
-        res.redirect("/shop#products_list");
-    else
-        res.redirect("/cart#products_list");
-
+    if (action === "add_product"){
+        res.json({product_id: product_id, products_unavailable: req.session.productsUnavailable});
+    }
+    else{
+        const index = req.session.cart.findIndex((element) => element.product_id == product_id);
+        computeCartTotal(req);
+        res.json({cart_element: req.session.cart[index], cart_total: req.session.cartTotal});
+    }
 }
 
-const removeCart = (req: Request, res: Response) => {
+const decreaseCart = (req: Request, res: Response) => {
     const product_id = req.body.product_id;
    
     const index = req.session.cart.findIndex((element) => element.product_id === product_id);
+    let product_removed: Boolean = false;
     if(index !== -1){
         req.session.cart[index].quantity--;
-        if(req.session.cart[index].quantity < req.session.cart[index].max_quantity){
+        if(req.session.cart[index].quantity < req.session.cart[index].max_quantity){ // product is again available 
             const j = req.session.productsUnavailable.findIndex((element) => element === product_id);
             if(j !== -1)
                 req.session.productsUnavailable.splice(j, 1);
         }
 
-        if(req.session.cart[index].quantity === 0)
-            req.session.cart.splice(index, 1);
+        if(req.session.cart[index].quantity === 0){
+            product_removed = true;
+            req.session.cart.splice(index, 1); // remove product from the cart
+        }
 
     }
    
-    res.redirect("/cart#products_list");
+    computeCartTotal(req);
+    if(!product_removed){
+        if(req.session.cart.length > 0)
+            res.json({product_deleted: false, cart_element: req.session.cart[index], cart_total: req.session.cartTotal});
+        else
+            res.json({product_deleted: false, cart_element: req.session.cart[index], cart_total: req.session.cartTotal, empty_cart: true});
+    }
+    else{
+        if(req.session.cart.length > 0)
+            res.json({product_deleted: true, product_id: product_id, cart_total: req.session.cartTotal});
+        else
+            res.json({product_deleted: true, product_id: product_id, cart_total: req.session.cartTotal, empty_cart: true});
+    }
 }
 
 
@@ -177,12 +195,16 @@ const emptyCart = (req:Request, res:Response ) => {
     checkSessionDataInitialized(req);
 
     while(req.session.cart.length > 0){
-    req.session.cart.pop()
+        req.session.cart.pop();
     }
 
-    req.session.cartTotal = 0.0
+    while(req.session.productsUnavailable.length > 0){
+        req.session.productsUnavailable.pop();
+    }
 
-    res.render("./cart", {cart_data: req.session.cart, cart_total: req.session.cartTotal});
+    req.session.cartTotal = 0.0;
+
+    res.redirect("/cart");
 }
 
 const aboutView = (req: Request, res: Response) => {
@@ -258,4 +280,5 @@ module.exports =  {
     removeCart,
     emptyCart,
     buyCart
+    decreaseCart,
 };
