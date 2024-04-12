@@ -225,7 +225,7 @@ type cartData = {
     product_id: number,
     product_name: string,
     price: number,
-    image: string,
+    img: string,
     quantity: number,
     max_quantity: number
 };
@@ -277,8 +277,7 @@ module.exports =  {
     checkoutView,
     thankyouView,
     addCart,
-    removeCart,
     emptyCart,
-    buyCart
+    buyCart,
     decreaseCart,
 };
