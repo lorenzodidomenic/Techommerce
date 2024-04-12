@@ -41,6 +41,10 @@ function checkSessionDataInitialized(req: Request){
         req.session.cartTotal = 0.0;
     }
 
+    if(!req.session.listOrderPrice){
+        req.session.listOrderPrice=[];
+    }
+
     if(!req.session.listOrderTotal){
         req.session.listOrderTotal = 0.0
     }
@@ -217,8 +221,10 @@ const buyCart =  (req: Request ,res: Response) => {
     for (let i = 0; i < req.session.cart.length; i++){
         cart.push(req.session.cart[i]);
     }
-  
-     req.session.listOrder.push(cart)
+
+    
+    req.session.listOrder.push(cart)
+    req.session.listOrderPrice.push(req.session.cartTotal)
 
     while(req.session.cart.length > 0){
         req.session.cart.pop()
@@ -227,7 +233,7 @@ const buyCart =  (req: Request ,res: Response) => {
     req.session.listOrderTotal += req.session.cartTotal;
     req.session.cartTotal = 0.0
 
-    res.render("./checkout", {listOrder: req.session.listOrder, listOrderTotal : req.session.listOrderTotal})   /* poi li stampo in checkotu*/
+    res.render("./checkout", {listOrder: req.session.listOrder, listOrderTotal : req.session.listOrderTotal, listOrderPrice: req.session.listOrderPrice})   /* poi li stampo in checkotu*/
 }
 
 const checkoutView = (req: Request, res: Response) => {

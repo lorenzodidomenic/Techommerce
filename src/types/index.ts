@@ -20,6 +20,7 @@ declare module 'express-session' {
         cart: cartData[],
         cartTotal: number,
         listOrder: cartData[][],   
+        listOrderPrice: number[],
         listOrderTotal: number,
         productsUnavailable: number[]   
     }
