@@ -4,7 +4,7 @@ type cartData = {
     product_id: number,
     product_name: string,
     price: number,
-    image: string,
+    img: string,
     quantity: number,
     max_quantity: number
 };

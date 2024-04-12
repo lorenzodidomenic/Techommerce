@@ -9,6 +9,7 @@
 <html lang="en">
 <head>
 	<%- include('./partials/meta-info.ejs'); -%>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 
 	<body>
@@ -61,27 +62,58 @@
                     <% if(products.length > 0) { %>
                         <% for (let i = 0; i < products.length; i++) { %>
                             <div class="col-12 col-md-4 col-lg-3 mb-5">
-								<form action="/add_cart" method="post">
-									<input type="hidden" name="action" value="add_product">
-									<input type="hidden" name="product_id" value="<%= products[i].id %>">
-									<input type="hidden" name="product_name" value="<%= products[i].name %>">
-									<input type="hidden" name="product_price" value="<%= products[i].price %>">
-									<input type="hidden" name="product_quantity" value="<%= products[i].quantity %>">
-									<input type="hidden" name="product_image" value="<%= products[i].img %>">
-									<div class="product-item">
-										<img src="images/<%= products[i].img %>" class="img-fluid product-thumbnail">
-										<h3 class="product-title"><%= products[i].name %></h3>
-										<small class="product-description"> <%= products[i].description %> </small> <br>
-										<strong class="product-price">€ <%= products[i].price.toFixed(2) %></strong>
-										<% if (products_unavailable.indexOf(String(products[i].id)) === -1) { %>
-											<span class="icon-cross">
-													<button>
-														<img src="images/cross.svg" class="img-fluid">
-													</button>
-											</span>
-										<% } %>
-									</div>
-								</form>
+								<div class="product-item">
+									<img src="images/<%= products[i].img %>" class="img-fluid product-thumbnail">
+									<h3 class="product-title"><%= products[i].name %></h3>
+									<small class="product-description"> <%= products[i].description %> </small> <br>
+									<strong class="product-price">€ <%= products[i].price.toFixed(2) %></strong>
+									<br><br>
+									<div id="unavailableMessageFor<%= products[i].id %>" style="display: none;"><b>Reach maximum quantity available!</b></div>
+									<div id="addToCartMsgFor<%= products[i].id %>" style="display: none;"><b>Product added in the cart!</b></div>
+									<script type="text/javascript">
+										// AJAX POST request when user want to add a product (or increment its quantity if already added)
+										$(document).ready(function(){
+											$("#addQuantity<%= products[i].id %>")
+												.on("click", function(){
+													let body = {
+															action: 'add_product',
+															product_id: '<%= products[i].id %>',
+															product_name: '<%= products[i].name %>',
+															product_price: '<%= products[i].price %>',
+															product_quantity: '<%= products[i].quantity %>',
+															product_image: '<%= products[i].img %>'
+													};
+								
+													$.post("/add_cart", body).done(function(response){
+														let id = response.product_id;
+														if(response.products_unavailable.indexOf(String(id)) != -1){
+															$(`#addQuantityContainer${id}`).css({"display": "none"}); // hide '+' button
+															$(`#unavailableMessageFor${id}`).css('display', 'block');
+														}else{
+															$(`#addToCartMsgFor${id}`).css({'display' : 'block', 'opacity' : '1'}); // reset initial properties (show message)
+															$(`#addToCartMsgFor${id}`).delay(5000).fadeOut('slow'); // hide msg with animation
+														}														
+													});
+							
+													return;
+												}); 
+										}); 
+									</script>
+									<!-- display '+' button only if product quantity permit -->
+									<% if (products_unavailable.indexOf(String(products[i].id)) == -1) { %>
+										<span id="addQuantityContainer<%= products[i].id %>" class="icon-cross">
+											<button id="addQuantity<%= products[i].id %>">
+												<img src="images/cross.svg" class="img-fluid">
+											</button>
+										</span>
+									<% } else { %>
+										<span id="addQuantityContainer<%= products[i].id %>" class="icon-cross" style="display: none">
+											<button id="addQuantity<%= products[i].id %>">
+												<img src="images/cross.svg" class="img-fluid">
+											</button>
+										</span>
+									<% } %>	
+								</div>
                             </div>
                         <% } %>
                     <% } else { %>

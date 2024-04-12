@@ -9,6 +9,13 @@
 <html lang="en">
 <head>
   <%- include('./partials/meta-info.ejs'); -%>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <style>
+    .fixed-width{
+      flex: 0 0 auto !important;
+      width: 50% !important;
+    }
+  </style>
 </head>
 
 	<body>
@@ -39,7 +46,7 @@
         <div class="row mb-5">
           <div class="site-blocks-table">
           <% if (cart_data.length > 0) { %>
-            <table class="table">
+            <table id="productTable" class="table">
               <thead>
                 <tr>
                   <th class="product-thumbnail">Image</th>
@@ -51,45 +58,111 @@
               </thead> 
               <tbody>
                 <% for (let i = 0; i < cart_data.length; i++) { %>
-                <tr> 
-                  <td class="product-thumbnail">
-                    <img src="images/<%= cart_data[i].image %>" alt="Image" class="img-fluid">
-                  </td>
-                  <td class="product-name">
-                    <h2 class="h5 text-black"><%= cart_data[i].product_name %></h2>
-                  </td>
-                  <td>€ <%= parseFloat(cart_data[i].price).toFixed(2) %></td>
-                  <td>
-                    <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px; margin-left: 65px;">
-                      <div class="input-group-prepend">
-                        <form action="/remove_cart" method="POST">
-                          <input type="hidden" name="product_id" value="<%= cart_data[i].product_id %>">
-                          <button class="btn btn-outline-black decrease">&minus;</button>
-                        </form>
-                      </div>
-                      <input type="number" disabled name="quantity" class="form-control text-center quantity-amount" value="<%= cart_data[i].quantity %>" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
-                      <div class="input-group-append">
-                        <form action="/add_cart" method="POST">
-                          <input type="hidden" name="action" value="increment_quantity">
-                          <input type="hidden" name="product_id" value="<%= cart_data[i].product_id %>">
-                          <input type="hidden" name="product_name" value="<%= cart_data[i].product_name %>">
-                          <input type="hidden" name="product_price" value="<%= cart_data[i].price %>">
-                          <input type="hidden" name="product_quantity" value="<%= cart_data[i].max_quantity %>">
-                          <input type="hidden" name="product_image" value="<%= cart_data[i].image %>">
-                          <% if (products_unavailable.indexOf(String(cart_data[i].product_id)) === -1) { %>
-                            <button class="btn btn-outline-black increase">&plus;</button>
+                  <tr id="productRow<%= cart_data[i].product_id %>"> 
+                    <td class="product-thumbnail">
+                      <img src="images/<%= cart_data[i].img %>" alt="Image" class="img-fluid">
+                    </td>
+                    <td class="product-name">
+                      <h2 class="h5 text-black"><%= cart_data[i].product_name %></h2>
+                    </td>
+                    <td>€ <%= parseFloat(cart_data[i].price).toFixed(2) %></td>
+                    <td>
+                      <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px; margin-left: 65px;">
+                        <div class="input-group-prepend">
+                          <script type="text/javascript">
+                            // AJAX POST request when user want to decrement quantity of a product
+                            $(document).ready(function(){
+                              $("#decreaseQuantity<%= cart_data[i].product_id %>")
+                                .on("click", function(){
+                                  let body = {
+                                      product_id: '<%= cart_data[i].product_id %>',  
+                                  };
+                        
+                                  $.post("/decrease_cart", body).done(function(response){
+                                    let total = response.cart_total;
+                                    $("#total").empty().html("€ " + total.toFixed(2));	
+
+                                    let empty_cart = response.empty_cart;
+                                    if(empty_cart){
+                                      $("#productTable").remove();
+                                      $("#emptyCartMsg").css({"display": "block"});
+                                      return;
+                                    }
+                                    											
+                                    if(!response.product_deleted){
+                                      let id = response.cart_element.product_id;
+                                      let price = response.cart_element.price;
+                                      let quantity = response.cart_element.quantity;
+                                      let max_quantity = response.cart_element.max_quantity;
+                                      $(`#quantityFor${id}`).empty().html(quantity);
+                                      $(`#totalFor${id}`).empty().html("€ " + (quantity*price).toFixed(2));
+                                      if(quantity < max_quantity)
+                                        $(`#addQuantity${id}`).css({"display" : "inline"}); // display '+' button if not shown
+                                    }
+                                    else{
+                                      let id = response.product_id;
+                                      $(`#productRow${id}`).remove();
+                                    }
+                                  });
+
+                                  return;
+                                }); 
+                            }); 
+                          </script>
+                          <button id="decreaseQuantity<%= cart_data[i].product_id %>" class="btn btn-outline-black decrease">&minus;</button>
+                        </div>
+                        <input type="text" readonly id="quantityFor<%= cart_data[i].product_id %>" name="quantity" class="form-control text-center quantity-amount fixed-width" value="<%= cart_data[i].quantity %>" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
+                        <div class="input-group-append">
+                          <script type="text/javascript">
+                            // AJAX POST request when user want to increment quantity of a product
+                            $(document).ready(function(){
+                              $("#addQuantity<%= cart_data[i].product_id %>")
+                                .on("click", function(){
+                                  let body = {
+                                      action: 'increment_quantity',
+                                      product_id: '<%= cart_data[i].product_id %>',
+                                      product_name: '<%= cart_data[i].product_name %>',
+                                      product_price: '<%= cart_data[i].price %>',
+                                      product_quantity: '<%= cart_data[i].max_quantity %>',
+                                      product_image: '<%= cart_data[i].img %>'
+                                  };
+                        
+                                  $.post("/add_cart", body).done(function(response){
+                                    let id = response.cart_element.product_id;
+                                    let price = response.cart_element.price;
+                                    let quantity = response.cart_element.quantity;
+                                    let max_quantity = response.cart_element.max_quantity;
+                                    let total = response.cart_total;
+                                    $(`#quantityFor${id}`).empty().html(quantity);
+                                    $(`#totalFor${id}`).empty().html("€ " + (quantity*price).toFixed(2));
+                                    if(quantity >= max_quantity)
+                                        $(`#addQuantity${id}`).css({"display" : "none"}); // hide '+' button
+                                    $("#total").empty().html("€ " + total.toFixed(2));												
+                                  });
+
+                                  return;
+                                }); 
+                            }); 
+                          </script>
+                          <!-- display '+' button only if product quantity permit -->
+                          <% if (products_unavailable.indexOf(String(cart_data[i].product_id)) == -1) { %> 
+                            <button id="addQuantity<%= cart_data[i].product_id %>" class="btn btn-outline-black increase">&plus;</button>
+                          <% } else { %>
+                            <button id="addQuantity<%= cart_data[i].product_id %>" class="btn btn-outline-black increase" style="display: none">&plus;</button>
                           <% } %>
-                        </form>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td>€ <%= parseFloat(cart_data[i].price).toFixed(2) %></td>
-                </tr>
+                    </td>
+                    <td id="totalFor<%= cart_data[i].product_id %>">€ <%= parseFloat(cart_data[i].price * cart_data[i].quantity).toFixed(2)  %></td>
+                  </tr>
                 <% } %>
               </tbody>
             </table>
+            <div id="emptyCartMsg" style="display: none"> <!-- FOR JS -->
+              <h2><b>No products in the cart!</b></h2>
+            </div>
            <% } else { %>
-             <div>
+             <div> <!-- FOR EJS -->
                  <h2><b>No products in the cart!</b></h2>
              </div>
            <% } %>
@@ -112,15 +185,7 @@
               <div class="col-md-7">
                 <div class="row">
                   <div class="col-md-12 text-right border-bottom mb-5">
-                    <h3 class="text-black h4 text-uppercase">Cart Totals</h3>
-                  </div>
-                </div>
-                <div class="row mb-3">
-                  <div class="col-md-6">
-                    <span class="text-black">Subtotal</span>
-                  </div>
-                  <div class="col-md-6 text-right">
-                    <strong class="text-black">€ <%= parseFloat(cart_total).toFixed(2) %></strong>
+                    <h3 class="text-black h4 text-uppercase">Cart Total</h3>
                   </div>
                 </div>
                 <div class="row mb-5">
@@ -128,7 +193,7 @@
                     <span class="text-black">Total</span>
                   </div>
                   <div class="col-md-6 text-right">
-                    <strong class="text-black">€ <%= parseFloat(cart_total).toFixed(2) %></strong>
+                    <strong id="total" class="text-black">€ <%= parseFloat(cart_total).toFixed(2) %></strong>
                   </div>
                 </div>
   
