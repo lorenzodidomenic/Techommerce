@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 require('dotenv').config();
 
+
 const mysql = require('mysql');
 const connection = mysql.createConnection({
   host     : process.env.HOST,
@@ -24,13 +25,24 @@ type Category = {
     name: string
 }
 
+
+
 function checkSessionDataInitialized(req: Request){
     if (!req.session.cart) {
         req.session.cart = [];
     }
 
+    if(!req.session.listOrder){
+        req.session.listOrder = [];
+    }
+
+
     if(!req.session.cartTotal){
         req.session.cartTotal = 0.0;
+    }
+
+    if(!req.session.listOrderTotal){
+        req.session.listOrderTotal = 0.0
     }
 
     if(!req.session.productsUnavailable){
@@ -155,6 +167,7 @@ const removeCart = (req: Request, res: Response) => {
     res.redirect("/cart#products_list");
 }
 
+
 const emptyCart = (req:Request, res:Response ) => {
 
     checkSessionDataInitialized(req);
@@ -182,6 +195,41 @@ const cartView = async (req: Request, res: Response) => {
     res.render("./cart", {cart_data: req.session.cart, cart_total: req.session.cartTotal, products_unavailable: req.session.productsUnavailable});
 }
 
+type cartData = {
+    product_id: number,
+    product_name: string,
+    price: number,
+    image: string,
+    quantity: number,
+    max_quantity: number
+};
+
+type Cart = {
+    cart: cartData[];
+}
+
+const buyCart =  (req: Request ,res: Response) => {
+  
+    checkSessionDataInitialized(req);
+
+    //se faccio la copia per riferimento non funziona
+    const cart: cartData[] = [];
+    for (let i = 0; i < req.session.cart.length; i++){
+        cart.push(req.session.cart[i]);
+    }
+  
+     req.session.listOrder.push(cart)
+
+    while(req.session.cart.length > 0){
+        req.session.cart.pop()
+        }
+
+    req.session.listOrderTotal += req.session.cartTotal;
+    req.session.cartTotal = 0.0
+
+    res.render("./checkout", {listOrder: req.session.listOrder, listOrderTotal : req.session.listOrderTotal})   /* poi li stampo in checkotu*/
+}
+
 const checkoutView = (req: Request, res: Response) => {
     res.render("./checkout");
 }
@@ -189,6 +237,7 @@ const checkoutView = (req: Request, res: Response) => {
 const thankyouView = (req: Request, res: Response) => {
     res.render("./thankyou");
 }
+
 
 module.exports =  {
     indexView,
@@ -201,5 +250,6 @@ module.exports =  {
     thankyouView,
     addCart,
     removeCart,
-    emptyCart
+    emptyCart,
+    buyCart
 };

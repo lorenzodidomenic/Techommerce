@@ -7,6 +7,7 @@ app.set('view engine', 'ejs');
 app.set('views', process.cwd() + '/src/views');
 
 //setto il middleware della sessione
+
 app.use(session({
     secret : '1234567890abcdefghijklmnopqrstuvwxyz',
 	resave : false,
