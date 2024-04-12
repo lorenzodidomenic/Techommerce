@@ -9,8 +9,7 @@ const { indexView,
         checkoutView,
         thankyouView,
         addCart,
-        removeCart,
-        buyCart
+        buyCart,
         decreaseCart,
         emptyCart } = require('../controllers/controllers');
 
