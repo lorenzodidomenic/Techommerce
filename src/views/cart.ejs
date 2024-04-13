@@ -10,12 +10,6 @@
 <head>
   <%- include('./partials/meta-info.ejs'); -%>
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <style>
-    .fixed-width{
-      flex: 0 0 auto !important;
-      width: 50% !important;
-    }
-  </style>
 </head>
 
 	<body>
@@ -67,7 +61,8 @@
                     </td>
                     <td>€ <%= parseFloat(cart_data[i].price).toFixed(2) %></td>
                     <td>
-                      <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px; margin-left: 65px;">
+                     <center>
+                      <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px;">
                         <div class="input-group-prepend">
                           <script type="text/javascript">
                             // AJAX POST request when user want to decrement quantity of a product
@@ -86,6 +81,7 @@
                                     if(empty_cart){
                                       $("#productTable").remove();
                                       $("#emptyCartMsg").css({"display": "block"});
+                                      $("#buyButton").remove();
                                       return;
                                     }
                                     											
@@ -152,6 +148,7 @@
                           <% } %>
                         </div>
                       </div>
+                     </center>
                     </td>
                     <td id="totalFor<%= cart_data[i].product_id %>">€ <%= parseFloat(cart_data[i].price * cart_data[i].quantity).toFixed(2)  %></td>
                   </tr>
@@ -202,7 +199,7 @@
                     <!-- ognuno degli elementi nel carrello manda tutti i valori -->
                     <% if(cart_data.length > 0){ %>
                      <form method="POST" action="/buyCart"> 
-                      <button class="btn btn-black btn-lg py-3 btn-block" >Proceed To Checkout</button> 
+                      <button id="buyButton" class="btn btn-black btn-lg py-3 btn-block" >Buy now</button> 
                     </form>
                     <% } %>
                   </div>

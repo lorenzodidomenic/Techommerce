@@ -23,7 +23,7 @@
 					<div class="row justify-content-between">
 						<div class="col-lg-5">
 							<div class="intro-excerpt">
-								<h1>Checkout</h1>
+								<h1>Orders</h1>
 							</div>
 						</div>
 						<div class="col-lg-7">
@@ -39,41 +39,37 @@
 
 		      <div class="row">
 	
-				<!-- parte lista ordini -->
+				<!-- Start list orders -->
 		        <div class="col-md-6 mb-5 mb-md-0">
 		          <h2 class="h3 mb-3 text-black">Last Orders List</h2>
 		          <div class="p-3 p-lg-5 border bg-white">
 		            <table class="table site-block-order-table mb-5">
 						<thead>
-						  <th>Nome Ordine </th>
+						  <th>Order details </th>
 						  <th>Total</th>
 						</thead>
 						<tbody>
-						<% for(let i = 0; i< listOrder.length; i++){ %> 
-						  <tr>
-							<td>Ordine<%= i %>
-								<ul>
-									<% for(let j = 0; j< listOrder[i].length; j++){ %>
-								<li> <%= listOrder[i][j].product_name %> <strong class="mx-2">x</strong> <%= listOrder[i][j].quantity %> </li>
-								    <% } %>
-								</ul>
-							</td>
-							<td>
-						      <%= listOrderPrice[i] %>
-							</td>
-						  </tr>
-						  
-						<% } %>
+							<% for(let i = 0; i < listOrder.length; i++){ %> 
+							<tr>
+								<td>Order <%= i+1 %>
+									<ul>
+										<% for(let j = 0; j < listOrder[i].length; j++){ %>
+											<li> <%= listOrder[i][j].product_name %> <strong class="mx-2">x</strong> <%= listOrder[i][j].quantity %> </li>
+										<% } %>
+									</ul>
+								</td>
+								<td>
+								€ <%= listOrderPrice[i] %>
+								</td>
+							</tr>	  
+							<% } %>
 						</tbody>
-					  </table>
-		           
+					</table>
 		          </div>
 		        </div>
-               <!-- finisce lista ordini -->
+               <!-- End list orders -->
 
-
-
-			   <!-- inizia totale degli ordini -->
+			   <!-- Start total order -->
 		        <div class="col-md-6">
 		          <div class="row mb-5">
 		            <div class="col-md-12">
@@ -81,26 +77,22 @@
 		              <div class="p-3 p-lg-5 border bg-white">
 		                <table class="table site-block-order-table mb-5">
 		                  <thead>
-		                    <th>Totale Speso </th>
-		                    <th> <%= listOrderTotal %> </th>
+		                    <td><b>Total spent </b></td>
+		                    <td></b>€ <%= listOrderTotal %> </b></td>
 		                  </thead>
 		                </table>
 
-		              
-
 		                <div class="form-group">
-		                  <form method="GET" action="/"> <button class="btn btn-black btn-lg py-3 btn-block" >Torna alla home </button> </form>
+		                  <form method="GET" action="/"> <button class="btn btn-black btn-lg py-3 btn-block" >Back to home </button> </form>
 		                </div>
-
 		              </div>
 		            </div>
 		          </div>
-
 		        </div>
-		      </div>
-		      <!-- </form> -->
-		    </div>
-		  </div>
+		      
+			  </div>
+		   </div>
+		</div>
 
 		<!-- Start Footer Section -->
 		<%- include('./partials/footer.ejs'); -%>

@@ -7,7 +7,6 @@ const session = require('express-session');
 app.set('view engine', 'ejs');
 app.set('views', process.cwd() + '/src/views');
 
-
 app.use(session({
     secret : '1234567890abcdefghijklmnopqrstuvwxyz',
 	resave : false,
