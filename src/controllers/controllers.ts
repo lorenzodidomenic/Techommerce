@@ -94,6 +94,14 @@ let getProductsByCategory = (category: string) => {
     });
 };
 
+let updateQuantity = (cart: cartData) => {
+        connection.query('UPDATE `products` SET `quantity`= ? WHERE `id` = ?', 
+        [cart.max_quantity - cart.quantity, cart.product_id], 
+        function (error: Error, results: Object) {
+            if (error) throw error;        
+        });
+}
+
 const indexView = (req: Request, res: Response) => {
     res.render("./index");
 }
@@ -233,6 +241,7 @@ const buyCart = (req: Request , res: Response) => {
     const cart: cartData[] = [];
     for (let i = 0; i < req.session.cart.length; i++){
         cart.push(req.session.cart[i]);
+        updateQuantity(req.session.cart[i]);
     }
 
     // add cart to list of orders
