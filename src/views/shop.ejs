@@ -65,11 +65,10 @@
 								<div class="product-item">
 									<img src="images/<%= products[i].img %>" class="img-fluid product-thumbnail">
 									<h3 class="product-title"><%= products[i].name %></h3>
-									<small class="product-description"> <%= products[i].description %> </small> <br>
+									<small class="product-description"> <%= products[i].description %> </small>
+									<br>
 									<strong class="product-price">€ <%= products[i].price.toFixed(2) %></strong>
-									<br><br>
-									<div id="unavailableMessageFor<%= products[i].id %>" style="display: none;"><b>Reach maximum quantity available!</b></div>
-									<div id="addToCartMsgFor<%= products[i].id %>" style="display: none;"><b>Product added in the cart!</b></div>
+									<br>
 									<script type="text/javascript">
 										// AJAX POST request when user want to add a product (or increment its quantity if already added)
 										$(document).ready(function(){
@@ -90,8 +89,8 @@
 															$(`#addQuantityContainer${id}`).css({"display": "none"}); // hide '+' button
 															$(`#unavailableMessageFor${id}`).css('display', 'block');
 														}else{
-															$(`#addToCartMsgFor${id}`).css({'display' : 'block', 'opacity' : '1'}); // reset initial properties (show message)
-															$(`#addToCartMsgFor${id}`).delay(5000).fadeOut('slow'); // hide msg with animation
+															$(`#addToCartMsgFor${id}`).css({'opacity' : '1'}); // reset initial properties (show message)
+															$(`#addToCartMsgFor${id}`).animate({"opacity": 0}, 7000); // hide msg with animation
 														}														
 													});
 							
@@ -99,14 +98,17 @@
 												}); 
 										}); 
 									</script>
+									<div id="addToCartMsgFor<%= products[i].id %>" style="opacity: 0;"><b>Product added in the cart!</b></div>
 									<!-- display '+' button only if product quantity permit -->
 									<% if (products_unavailable.indexOf(String(products[i].id)) == -1) { %>
+										<div id="unavailableMessageFor<%= products[i].id %>" style="display: none"><b>Reach maximum quantity available!</b></div>
 										<span id="addQuantityContainer<%= products[i].id %>" class="icon-cross">
 											<button id="addQuantity<%= products[i].id %>">
 												<img src="images/cross.svg" class="img-fluid">
 											</button>
 										</span>
 									<% } else { %>
+										<div id="unavailableMessageFor<%= products[i].id %>"><b>Reach maximum quantity available!</b></div>
 										<span id="addQuantityContainer<%= products[i].id %>" class="icon-cross" style="display: none">
 											<button id="addQuantity<%= products[i].id %>">
 												<img src="images/cross.svg" class="img-fluid">

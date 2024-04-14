@@ -268,6 +268,12 @@ a {
       visibility: visible; }
     .product-section .product-item:hover:before {
       height: 70%; }
+    .product-section .product-item:hover .product-description{
+      display: inline;
+    }
+    .product-section .product-item .product-description {
+      display: none;
+    }
 
 .why-choose-section {
   padding: 7rem 0; }
@@ -643,6 +649,11 @@ a {
   .form-control:-moz-placeholder {
     font-size: 14px; }
 
+  .fixed-width{
+    flex: 0 0 auto !important;
+    width: 50% !important;
+  }
+
 .service {
   line-height: 1.5; }
   .service .service-icon {
@@ -709,12 +720,3 @@ textarea {
     height: 50px;
     border-radius: 50%;
     background: rgba(59, 93, 80, 0.2); }
-
-  
-.product-title+.product-description {
-    display: none;
-}
-    
-.product-title:hover+.product-description{
-    display: inline;
-}

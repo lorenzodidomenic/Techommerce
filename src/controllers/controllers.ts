@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 require('dotenv').config();
 
-
 const mysql = require('mysql');
 const connection = mysql.createConnection({
   host     : process.env.HOST,
@@ -25,28 +24,25 @@ type Category = {
     name: string
 }
 
-
-
 function checkSessionDataInitialized(req: Request){
     if (!req.session.cart) {
         req.session.cart = [];
+    }
+
+    if(!req.session.cartTotal){
+        req.session.cartTotal = 0.0;
     }
 
     if(!req.session.listOrder){
         req.session.listOrder = [];
     }
 
-
-    if(!req.session.cartTotal){
-        req.session.cartTotal = 0.0;
-    }
-
     if(!req.session.listOrderPrice){
-        req.session.listOrderPrice=[];
+        req.session.listOrderPrice = [];
     }
 
     if(!req.session.listOrderTotal){
-        req.session.listOrderTotal = 0.0
+        req.session.listOrderTotal = 0.0;
     }
 
     if(!req.session.productsUnavailable){
@@ -197,8 +193,7 @@ const decreaseCart = (req: Request, res: Response) => {
     }
 }
 
-
-const emptyCart = (req:Request, res:Response ) => {
+const emptyCart = (req:Request, res:Response) => {
 
     checkSessionDataInitialized(req);
 
@@ -223,7 +218,7 @@ const contactView = (req: Request, res: Response) => {
     res.render("./contact");
 }
 
-const cartView = async (req: Request, res: Response) => {
+const cartView = (req: Request, res: Response) => {
     checkSessionDataInitialized(req);
     computeCartTotal(req);
     res.render("./cart", {cart_data: req.session.cart, cart_total: req.session.cartTotal, products_unavailable: req.session.productsUnavailable});
@@ -238,43 +233,41 @@ type cartData = {
     max_quantity: number
 };
 
-type Cart = {
-    cart: cartData[];
-}
-
-const buyCart =  (req: Request ,res: Response) => {
+const buyCart = (req: Request , res: Response) => {
   
     checkSessionDataInitialized(req);
 
-    //se faccio la copia per riferimento non funziona
+    // deep clone of the cart
     const cart: cartData[] = [];
     for (let i = 0; i < req.session.cart.length; i++){
         cart.push(req.session.cart[i]);
         updateQuantity(req.session.cart[i]);
     }
 
-    
-    req.session.listOrder.push(cart)
-    req.session.listOrderPrice.push(req.session.cartTotal)
-
-    while(req.session.cart.length > 0){
-        req.session.cart.pop()
-        }
-
+    // add cart to list of orders
+    req.session.listOrder.push(cart);
+    req.session.listOrderPrice.push(req.session.cartTotal);
     req.session.listOrderTotal += req.session.cartTotal;
-    req.session.cartTotal = 0.0
 
-    res.render("./checkout", {listOrder: req.session.listOrder, listOrderTotal : req.session.listOrderTotal, listOrderPrice: req.session.listOrderPrice})   /* poi li stampo in checkotu*/
+    // empty cart
+    while(req.session.cart.length > 0){
+        req.session.cart.pop();
+    }
+    while(req.session.productsUnavailable.length > 0){
+        req.session.productsUnavailable.pop();
+    }
+    req.session.cartTotal = 0.0;
+
+    res.redirect("./orders");   /* print values in orders page */
 }
 
-const checkoutView = (req: Request, res: Response) => {
-    res.render("./checkout");
+const ordersView = (req: Request, res: Response) => {
+    res.render("./orders", {listOrder: req.session.listOrder, listOrderPrice: req.session.listOrderPrice, listOrderTotal : req.session.listOrderTotal});
 }
 
 const thankyouView = (req: Request, res: Response) => {
     res.render("./thankyou");
 }
-
 
 module.exports =  {
     indexView,
@@ -283,10 +276,10 @@ module.exports =  {
     aboutView,
     contactView,
     cartView,
-    checkoutView,
+    ordersView,
     thankyouView,
+    decreaseCart,
     addCart,
     emptyCart,
-    buyCart,
-    decreaseCart,
+    buyCart
 };
