@@ -59,7 +59,7 @@
 									</ul>
 								</td>
 								<td>
-								€ <%= listOrderPrice[i] %>
+								€ <%= listOrderPrice[i].toFixed(2) %>
 								</td>
 							</tr>	  
 							<% } %>
@@ -78,7 +78,7 @@
 		                <table class="table site-block-order-table mb-5">
 		                  <thead>
 		                    <td><b>Total spent </b></td>
-		                    <td></b>€ <%= listOrderTotal %> </b></td>
+		                    <td></b>€ <%= listOrderTotal.toFixed(2) %> </b></td>
 		                  </thead>
 		                </table>
 
