@@ -9,6 +9,11 @@ const connection = mysql.createConnection({
   database : process.env.DB
 });
 
+connection.connect(function(err: Error) {
+    if (err) 
+       throw err;
+});
+
 export type Product = {
     id: number,
     name: string,
@@ -23,6 +28,16 @@ type Category = {
     id: number,
     name: string
 }
+
+
+type cartData = {
+    product_id: number,
+    product_name: string,
+    price: number,
+    img: string,
+    quantity: number,
+    max_quantity: number
+};
 
 function checkSessionDataInitialized(req: Request){
     if (!req.session.cart) {
@@ -98,7 +113,8 @@ let updateQuantity = (cart: cartData) => {
         connection.query('UPDATE `products` SET `quantity`= ? WHERE `id` = ?', 
         [cart.max_quantity - cart.quantity, cart.product_id], 
         function (error: Error, results: Object) {
-            if (error) throw error;        
+            if (error) 
+               throw error;        
         });
 }
 
@@ -223,15 +239,6 @@ const cartView = (req: Request, res: Response) => {
     computeCartTotal(req);
     res.render("./cart", {cart_data: req.session.cart, cart_total: req.session.cartTotal, products_unavailable: req.session.productsUnavailable});
 }
-
-type cartData = {
-    product_id: number,
-    product_name: string,
-    price: number,
-    img: string,
-    quantity: number,
-    max_quantity: number
-};
 
 const buyCart = (req: Request , res: Response) => {
   
