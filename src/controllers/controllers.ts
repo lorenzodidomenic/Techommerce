@@ -29,7 +29,6 @@ type Category = {
     name: string
 }
 
-
 type cartData = {
     product_id: number,
     product_name: string,
@@ -272,10 +271,6 @@ const ordersView = (req: Request, res: Response) => {
     res.render("./orders", {listOrder: req.session.listOrder, listOrderPrice: req.session.listOrderPrice, listOrderTotal : req.session.listOrderTotal});
 }
 
-const thankyouView = (req: Request, res: Response) => {
-    res.render("./thankyou");
-}
-
 module.exports =  {
     indexView,
     shopView,
@@ -284,7 +279,6 @@ module.exports =  {
     contactView,
     cartView,
     ordersView,
-    thankyouView,
     decreaseCart,
     addCart,
     emptyCart,
