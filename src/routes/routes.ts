@@ -7,7 +7,6 @@ const { indexView,
         contactView,
         cartView,
         ordersView,
-        thankyouView,
         addCart,
         buyCart,
         decreaseCart,
@@ -26,6 +25,5 @@ router.post('/empty_cart',emptyCart);
 router.post('/decrease_cart', decreaseCart);
 router.post('/buyCart', buyCart);
 router.get('/orders', ordersView);
-router.get('/thankyou', thankyouView);
 
 module.exports = router;
