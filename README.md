@@ -11,29 +11,66 @@ Visionando il carrello prima della conferma dell'acquisto, è possibile modifica
 All'utente è data la possibilità di visionare, dalla pagina del suo profilo, la lista degli ordini effettuati in una sessione sulla piattaforma, visualizzando il totale speso.\
 L'utente può anche ottenere informazioni sui proprietari della piattaforma, eventuali contatti per assistenza e visionare recensioni di altri utenti.
 
-## Requisiti 
+## Come avviarlo 
+- npm
+- docker
 
+## Avviarlo con npm
+
+#### Requisiti:
 - node.js
 - npm
 - database mysql
 
-## Come avviarlo 
-
-
-- <code> npm install </code>
--  creare un file .env che segua il seguente template:
+#### Steps:
+1)  <code> npm install </code>
+2)  creare un file .env che segua il seguente template:
   ```bash
-     #Environment variables.
+     # ENVIRONMENT VARIABLES
      STATUS=development
-     #Development port
+     # Development port
      DEV_PORT=8000 
-     #DB CONFIG
+     # DB config
      HOST=localhost
      USER=
      PASSWORD=
      DB=techommerce
      DIALECT=mysql
   ```
-- <code> npm start </code>
+3) <code> npm start </code>
+4) go to http://localhost:8000
 
 Un semplice esempio di database può essere generato passando al server mysql il file techommerce.sql che si trova all'interno della cartella db.
+
+## Avviarlo con Docker
+
+#### Requisiti:
+- docker engine
+
+#### Steps:
+1)  creare un file .env che segua il seguente template:
+  ```bash
+     # ENVIRONMENT VARIABLES
+     STATUS=development
+     # Development port
+     DEV_PORT=8000 
+     # DB config
+     HOST=localhost
+     USER=
+     PASSWORD=
+     DB=techommerce
+     DIALECT=mysql
+
+    # For docker compose
+    MYSQLDB_USER=root
+    MYSQLDB_ROOT_PASSWORD=
+    MYSQL_ALLOW_EMPTY_PASSWORD=true
+    MYSQLDB_DATABASE=techommerce
+    MYSQLDB_LOCAL_PORT=3307
+    MYSQLDB_DOCKER_PORT=3306
+    
+    NODE_LOCAL_PORT=8000
+    NODE_DOCKER_PORT=8000
+  ```
+2) <code> docker compose up </code>
+3) go to http://localhost:8000
