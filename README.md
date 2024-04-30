@@ -32,7 +32,7 @@ L'utente può anche ottenere informazioni sui proprietari della piattaforma, eve
      DEV_PORT=8000 
      # DB config
      HOST=localhost
-     USER=
+     USER=root
      PASSWORD=
      DB=techommerce
      DIALECT=mysql
@@ -56,7 +56,7 @@ Un semplice esempio di database può essere generato passando al server mysql il
      DEV_PORT=8000 
      # DB config
      HOST=localhost
-     USER=
+     USER=root
      PASSWORD=
      DB=techommerce
      DIALECT=mysql
