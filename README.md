@@ -74,3 +74,5 @@ Un semplice esempio di database può essere generato passando al server mysql il
   ```
 2) <code> docker compose up </code>
 3) go to http://localhost:8000
+
+Se al primo tentativo la connessione a mysql non va, provare una seconda volta.
