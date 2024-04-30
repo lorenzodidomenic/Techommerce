@@ -27,11 +27,12 @@ SET time_zone = "+00:00";
 -- Table structure for table `categories`
 --
 
-CREATE SCHEMA techommerce;
+DROP SCHEMA IF EXISTS techommerce;
+CREATE SCHEMA IF NOT EXISTS techommerce;
 USE techommerce;
 
 
-CREATE TABLE `categories` (
+CREATE TABLE IF NOT EXISTS `categories` (
   `id` bigint(20) NOT NULL,
   `name` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -54,7 +55,7 @@ INSERT INTO `categories` (`id`, `name`) VALUES
 -- Table structure for table `products`
 --
 
-CREATE TABLE `products` (
+CREATE TABLE IF NOT EXISTS  `products` (
   `id` bigint(20) NOT NULL,
   `name` varchar(50) NOT NULL,
   `price` double NOT NULL,

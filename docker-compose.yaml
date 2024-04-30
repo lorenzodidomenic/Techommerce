@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  mysqldb:
+    image: mysql:latest
+    env_file: ./.env
+    environment:
+      - MYSQL_ROOT_PASSWORD=$MYSQLDB_ROOT_PASSWORD
+      - MYSQL_DATABASE=$MYSQLDB_DATABASE
+    ports:
+      - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
+  app:
+    depends_on:
+      - mysqldb
+    build: ./
+    env_file: ./.env
+    ports:
+      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+    environment:
+      - HOST=mysqldb
+      - USER=$MYSQLDB_USER
+      - PASSWORD=$MYSQLDB_ROOT_PASSWORD
+      - NAME=$MYSQLDB_DATABASE
+      - PORT=$MYSQLDB_DOCKER_PORT
+    stdin_open: true
+    tty: true
+  db_seeder:
+    image: mysql:latest
+    volumes:
+      - ./db/techommerce.sql:/db/techommerce.sql
+    entrypoint: [ "bash", "-c", "sleep 5 && echo 'db initializing...' && mysql --user=root --host=mysqldb --port=3306 techommerce < /db/techommerce.sql && echo 'finish db initializing' && exit"] 
+    depends_on:
+      - mysqldb
+#volumes: 
+#  db:
